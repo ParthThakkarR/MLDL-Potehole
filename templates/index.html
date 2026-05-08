@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered pothole detection system using YOLOv8 deep learning model">
+    <title>PotholeAI - Intelligent Road Inspection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚧</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="40" height="40" rx="10" fill="url(#logoGradient)"/>
+                            <path d="M12 28L20 12L28 28H12Z" fill="white" fill-opacity="0.9"/>
+                            <circle cx="20" cy="22" r="3" fill="white"/>
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0" y1="0" x2="40" y2="40">
+                                    <stop stop-color="#6366F1"/>
+                                    <stop offset="1" stop-color="#8B5CF6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <span class="logo-text">PotholeAI</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="9" rx="1"/>
+                        <rect x="14" y="3" width="7" height="5" rx="1"/>
+                        <rect x="14" y="12" width="7" height="9" rx="1"/>
+                        <rect x="3" y="16" width="7" height="5" rx="1"/>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-page="upload">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span>Upload Image</span>
+                </a>
+                <a href="#" class="nav-item" data-page="live">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="23 7 16 12 23 17 23 7"/>
+                        <rect x="1" y="5" width="15" height="14" rx="2"/>
+                    </svg>
+                    <span>Live Detection</span>
+                </a>
+                <a href="#" class="nav-item" data-page="history">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>History</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="model-status">
+                    <div class="status-dot online"></div                    >
+                    <span>YOLOv8 Active</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12h18M3 6h18M3 18h18"/>
+                        </svg>
+                    </button>
+                    <div class="page-title">
+                        <h1 id="pageTitle">Dashboard</h1>
+                        <p class="page-subtitle">Real-time road defect detection</p>
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle theme">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                        </svg>
+                    </button>
+                    <div class="navbar-divider"></div>
+                    <div class="user-menu">
+                        <div class="user-avatar">
+                            <span>A</span>
+                        </div>
+                        <span class="user-name">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div class="page-content active" id="dashboardPage">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon potholes">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" data-count="0">0</span>
+                            <span class="stat-label">Total Detections</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                            </svg>
+                            <span>+12.5%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon images">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" data-count="0">0</span>
+                            <span class="stat-label">Images Analyzed</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                            </svg>
+                            <span>+8.3%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon accuracy">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" data-count="0">0</span>
+                            <span class="stat-label">Avg. Accuracy %</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                            </svg>
+                            <span>+2.1%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon speed">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" data-count="0">0</span>
+                            <span class="stat-label">ms Avg. Speed</span>
+                        </div>
+                        <div class="stat-trend down">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                            </svg>
+                            <span>-5ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Detection Trends</h3>
+                            <div class="chart-legend">
+                                <span class="legend-item"><span class="legend-dot" style="background: #6366F1;"></span> This Week</span>
+                                <span class="legend-item"><span class="legend-dot" style="background: #A5B4FC;"></span> Last Week</span>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="detectionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Confidence Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="confidenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Timeline & Recent -->
+                <div class="bottom-row">
+                    <div class="activity-card">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                            <button class="view-all-btn">View All</button>
+                        </div>
+                        <div class="activity-list" id="activityList">
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">Image analyzed successfully</span>
+                                    <span class="activity-time">2 minutes ago</span>
+                                </div>
+                                <span class="activity-badge success">3 Detections</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon info">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                                        <polyline points="21 15 16 10 5 21"/>
+                                    </svg>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">New image uploaded</span>
+                                    <span class="activity-time">5 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon warning">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="23 7 16 12 23 17 23 7"/>
+                                        <rect x="1" y="5" width="15" height="14" rx="2"/>
+                                    </svg>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">Video processing completed</span>
+                                    <span class="activity-time">15 minutes ago</span>
+                                </div>
+                                <span class="activity-badge warning">12 Detections</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">Batch analysis completed</span>
+                                    <span class="activity-time">1 hour ago</span>
+                                </div>
+                                <span class="activity-badge success">47 Detections</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recent-uploads-card">
+                        <div class="card-header">
+                            <h3>Recent Uploads</h3>
+                        </div>
+                        <div class="recent-uploads-list">
+                            <div class="recent-upload-item">
+                                <div class="upload-thumb">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect fill='%23E0E7FF' width='40' height='40' rx='8'/%3E%3Cpath fill='%236366F1' d='M20 10l-8 10h6v10h4V20h6L20 10z'/%3E%3C/svg%3E" alt="Thumbnail">
+                                </div>
+                                <div class="upload-info">
+                                    <span class="upload-name">road_image_001.jpg</span>
+                                    <span class="upload-meta">3 potholes • 98% conf.</span>
+                                </div>
+                                <span class="upload-time">2m ago</span>
+                            </div>
+                            <div class="recent-upload-item">
+                                <div class="upload-thumb">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect fill='%23FEF3C7' width='40' height='40' rx='8'/%3E%3Cpath fill='%23F59E0B' d='M20 10l-8 10h6v10h4V20h6L20 10z'/%3E%3C/svg%3E" alt="Thumbnail">
+                                </div>
+                                <div class="upload-info">
+                                    <span class="upload-name">highway_scan.png</span>
+                                    <span class="upload-meta">1 pothole • 85% conf.</span>
+                                </div>
+                                <span class="upload-time">15m ago</span>
+                            </div>
+                            <div class="recent-upload-item">
+                                <div class="upload-thumb">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect fill='%23DCFCE7' width='40' height='40' rx='8'/%3E%3Cpath fill='%2322C55E' d='M20 10l-8 10h6v10h4V20h6L20 10z'/%3E%3C/svg%3E" alt="Thumbnail">
+                                </div>
+                                <div class="upload-info">
+                                    <span class="upload-name">city_road_2024.jpg</span>
+                                    <span class="upload-meta">5 potholes • 92% conf.</span>
+                                </div>
+                                <span class="upload-time">1h ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Page -->
+            <div class="page-content" id="uploadPage">
+                <div class="upload-container">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-dropzone" id="dropzone">
+                            <div class="dropzone-content">
+                                <div class="upload-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                        <polyline points="17 8 12 3 7 8"/>
+                                        <line x1="12" y1="3" x2="12" y2="15"/>
+                                    </svg>
+                                </div>
+                                <h3>Drop your image here</h3>
+                                <p>or click to browse files</p>
+                                <span class="supported-formats">Supports: JPG, JPEG, PNG, GIF, BMP, WebP</span>
+                            </div>
+                            <input type="file" id="fileInput" accept="image/*" hidden>
+                        </div>
+
+                        <!-- Preview State -->
+                        <div class="preview-container" id="previewContainer" style="display: none;">
+                            <div class="preview-image-wrapper">
+                                <img id="previewImage" src="" alt="Preview">
+                                <button class="remove-preview" id="removePreview">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                        <line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="preview-info">
+                                <span class="preview-filename" id="previewFilename"></span>
+                                <span class="preview-size" id="previewSize"></span>
+                            </div>
+                        </div>
+
+                        <!-- Processing State -->
+                        <div class="processing-container" id="processingContainer" style="display: none;">
+                            <div class="processing-animation">
+                                <div class="scanner-line"></div>
+                                <div class="scanner-grid"></div>
+                            </div>
+                            <h3>Processing Image...</h3>
+                            <p>Running YOLOv8 detection</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">Analyzing...</span>
+                        </div>
+
+                        <!-- Success State -->
+                        <div class="success-container" id="successContainer" style="display: none;">
+                            <div class="success-animation">
+                                <svg viewBox="0 0 52 52" class="checkmark">
+                                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                </svg>
+                            </div>
+                            <h3>Detection Complete!</h3>
+                            <p>Potholes identified successfully</p>
+                        </div>
+                    </div>
+
+                    <!-- Detect Button -->
+                    <button class="detect-btn" id="detectBtn" disabled>
+                        <span class="btn-text">Detect Potholes</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Detection Page -->
+            <div class="page-content" id="livePage">
+                <div class="live-container">
+                    <div class="live-video-card">
+                        <div class="video-card-header">
+                            <div class="stream-status" id="streamStatus">
+                                <span class="status-indicator stopped"></span>
+                                <span class="status-text">STOPPED</span>
+                            </div>
+                            <div class="video-stats" id="videoStats" style="display: none;">
+                                <span class="stat-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                    <span id="fpsCounter">0</span> FPS
+                                </span>
+                                <span class="stat-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    </svg>
+                                    <span id="detectionCounter">0</span> Detections
+                                </span>
+                            </div>
+                        </div>
+                        <div class="video-wrapper" id="videoWrapper">
+                        <img id="liveVideo" alt="Live Video Stream">
+                        <div class="video-placeholder" id="videoPlaceholder">
+                            <div class="placeholder-visual">
+                                <div class="outer-ring"></div>
+                                <div class="inner-circle">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <polygon points="23 7 16 12 23 17 23 7"/>
+                                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <h3>Live Detection Feed</h3>
+                            <p>Select a video file to begin real-time pothole identification</p>
+                            <div class="placeholder-hints">
+                                <span class="hint-item">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    High Accuracy
+                                </span>
+                                <span class="hint-item">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    Real-time
+                                </span>
+                            </div>
+                        </div>
+                        <div class="video-overlay" id="videoOverlay" style="display: none;">
+                            <div class="overlay-stats">
+                                <span class="overlay-detection" id="overlayDetection">0</span>
+                                <span class="overlay-label">Potholes</span>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="video-card-footer">
+                            <div class="upload-video-btn" id="uploadVideoBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Select Video</span>
+                            </div>
+                            <input type="file" id="videoInput" accept="video/*" hidden>
+                            <div class="video-controls" id="videoControls" style="display: none;">
+                                <button class="control-btn start" id="startStreamBtn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                    <span>Start</span>
+                                </button>
+                                <button class="control-btn stop" id="stopStreamBtn" style="display: none;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <rect x="6" y="6" width="12" height="12"/>
+                                    </svg>
+                                    <span>Stop</span>
+                                </button>
+                            </div>
+                            <div class="video-info" id="videoInfo" style="display: none;">
+                                <span id="videoFilename"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Page -->
+            <div class="page-content" id="historyPage">
+                <div class="history-container">
+                    <div class="history-header">
+                        <div class="history-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="today">Today</button>
+                            <button class="filter-btn" data-filter="week">This Week</button>
+                            <button class="filter-btn" data-filter="month">This Month</button>
+                        </div>
+                        <div class="search-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" placeholder="Search detections..." id="searchInput">
+                        </div>
+                    </div>
+                    <div class="history-grid" id="historyGrid">
+                        <!-- History items will be dynamically populated -->
+                        <div class="history-empty">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <h3>No Detection History</h3>
+                            <p>Upload images or start live detection to see history here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="page-content" id="settingsPage">
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3>Model Configuration</h3>
+                        <div class="settings-card">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <span class="setting-label">Confidence Threshold</span>
+                                    <span class="setting-desc">Minimum confidence level for detections</span>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="range" min="0" max="100" value="25" id="confidenceSlider">
+                                    <span class="setting-value" id="confidenceValue">25%</span>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <span class="setting-label">Bounding Box Line Width</span>
+                                    <span class="setting-desc">Thickness of detection boxes</span>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="range" min="1" max="10" value="4" id="lineWidthSlider">
+                                    <span class="setting-value" id="lineWidthValue">4px</span>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <span class="setting-label">Show Labels</span>
+                                    <span class="setting-desc">Display class labels on detections</span>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked id="showLabels">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <span class="setting-label">Show Confidence</span>
+                                    <span class="setting-desc">Display confidence scores on detections</span>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked id="showConfidence">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Appearance</h3>
+                        <div class="settings-card">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <span class="setting-label">Dark Mode</span>
+                                    <span class="setting-desc">Toggle dark/light theme</span>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="darkModeToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <span class="setting-label">Compact Mode</span>
+                                    <span class="setting-desc">Reduce spacing for more content</span>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="compactModeToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>About</h3>
+                        <div class="settings-card about-card">
+                            <div class="about-logo">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="40" height="40" rx="10" fill="url(#aboutLogoGradient)"/>
+                                    <path d="M12 28L20 12L28 28H12Z" fill="white" fill-opacity="0.9"/>
+                                    <circle cx="20" cy="22" r="3" fill="white"/>
+                                    <defs>
+                                        <linearGradient id="aboutLogoGradient" x1="0" y1="0" x2="40" y2="40">
+                                            <stop stop-color="#6366F1"/>
+                                            <stop offset="1" stop-color="#8B5CF6"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="about-info">
+                                <h4>PotholeAI</h4>
+                                <p>Version 1.0.0</p>
+                                <p class="about-desc">AI-powered road defect detection system using YOLOv8 deep learning model</p>
+                            </div>
+                            <div class="about-specs">
+                                <div class="spec-row">
+                                    <span>Model</span>
+                                    <span>YOLOv8 (Ultralytics)</span>
+                                </div>
+                                <div class="spec-row">
+                                    <span>Framework</span>
+                                    <span>Flask + Python</span>
+                                </div>
+                                <div class="spec-row">
+                                    <span>Max File Size</span>
+                                    <span>100 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section (for image detection results) -->
+            <div class="results-overlay" id="resultsOverlay" style="display: none;">
+                <div class="results-container">
+                    <div class="results-header">
+                        <h2>Detection Results</h2>
+                        <button class="close-results" id="closeResults">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="result-stat-card">
+                            <span class="result-stat-value" id="resNumDetections">0</span>
+                            <span class="result-stat-label">Potholes Detected</span>
+                        </div>
+                        <div class="result-stat-card">
+                            <span class="result-stat-value" id="resAvgConf">0%</span>
+                            <span class="result-stat-label">Avg. Confidence</span>
+                        </div>
+                        <div class="result-stat-card">
+                            <span class="result-stat-value" id="resProcTime">0ms</span>
+                            <span class="result-stat-label">Processing Time</span>
+                        </div>
+                    </div>
+
+                    <div class="results-comparison">
+                        <div class="result-panel">
+                            <div class="panel-header">
+                                <span>Original Image</span>
+                            </div>
+                            <div class="panel-image" id="originalPanel">
+                                <img src="" alt="Original" id="originalImg">
+                            </div>
+                        </div>
+                        <div class="result-panel">
+                            <div class="panel-header">
+                                <span>Detected Potholes</span>
+                                <div class="legend">
+                                    <span class="legend-item">
+                                        <span class="legend-color" style="background: #6366F1;"></span>
+                                        Pothole
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="panel-image" id="resultPanel">
+                                <img src="" alt="Result" id="resultImg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confidence-meter">
+                        <h4>Confidence Distribution</h4>
+                        <div class="meter-bars">
+                            <div class="meter-bar">
+                                <span class="bar-label">High (80-100%)</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill high" style="width: 0%"></div>
+                                </div>
+                                <span class="bar-value" id="resConfHigh">0%</span>
+                            </div>
+                            <div class="meter-bar">
+                                <span class="bar-label">Medium (50-80%)</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill medium" style="width: 0%"></div>
+                                </div>
+                                <span class="bar-value" id="resConfMedium">0%</span>
+                            </div>
+                            <div class="meter-bar">
+                                <span class="bar-label">Low (< 50%)</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill low" style="width: 0%"></div>
+                                </div>
+                                <span class="bar-value" id="resConfLow">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="action-btn secondary" id="downloadResult">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Result
+                        </button>
+                        <button class="action-btn primary" id="newDetection">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            New Detection
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // Set this flag when results exist from Flask
+        {% if original_image or result_image %}
+        window.showResultsOnLoad = true;
+        {% endif %}
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
