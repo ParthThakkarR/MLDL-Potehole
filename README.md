@@ -151,6 +151,37 @@ yolo detect train data=<path-to-data.yaml> model=yolov8n.pt epochs=100
 
 This project is for educational and research purposes.
 
+## Deploy to Render (Free)
+
+This app is ready to deploy on **Render** free tier.
+
+### Steps
+
+1. **Push your code to GitHub** (if not already):
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push
+   ```
+
+2. **Go to** https://dashboard.render.com/ → **New +** → **Web Service**
+
+3. **Connect your GitHub repo** and use these settings:
+
+   | Setting | Value |
+   |---|---|
+   | Name | `pothole-detection` |
+   | Runtime | **Python 3** |
+   | Build Command | `pip install -r requirements.txt` |
+   | Start Command | `gunicorn app:app --bind 0.0.0.0:$PORT` |
+   | Plan | **Free** |
+
+4. Click **Deploy**.
+
+Render auto-detects the `PORT` env var (already handled in `app.py`). Your app will be live at `https://pothole-detection.onrender.com` in ~5 minutes.
+
+> **Note:** The free tier spins down after 15 min of inactivity. It wakes up automatically on the next visit (takes ~30 seconds).
+
 ## Notes
 
 - The `uploads/` and `results/` directories are automatically created at runtime

@@ -135,7 +135,6 @@ dataset_Yolo/
 datasets/
 
 # Model files (large binary files)
-*.pt
 *.pth
 *.h5
 *.pkl
@@ -181,6 +180,5 @@ logs/
 Thumbs.db
 
 # Project specific
-pothole_yolo/
 detection_history.json
 settings.json

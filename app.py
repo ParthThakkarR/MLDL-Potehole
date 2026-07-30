@@ -843,10 +843,13 @@ if __name__ == '__main__':
     """
     Run the Flask application.
     """
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', '1') == '1'
+    
     print(f"Upload folder: {UPLOAD_FOLDER}")
     print(f"Results folder: {RESULTS_FOLDER}")
     print(f"Model path: {MODEL_PATH}")
-    print("\nStarting Flask server...")
-    print("Go to http://127.0.0.1:5000 to use the application")
+    print(f"\nStarting Flask server on port {port}...")
+    print(f"Go to http://127.0.0.1:{port} to use the application")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=debug, host='0.0.0.0', port=port)
