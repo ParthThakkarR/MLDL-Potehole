@@ -173,7 +173,7 @@ This app is ready to deploy on **Render** free tier.
    | Name | `pothole-detection` |
    | Runtime | **Python 3** |
    | Build Command | `pip install -r requirements.txt` |
-   | Start Command | `gunicorn app:app --bind 0.0.0.0:$PORT` |
+   | Start Command | `gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120` |
    | Plan | **Free** |
 
 4. Click **Deploy**.
